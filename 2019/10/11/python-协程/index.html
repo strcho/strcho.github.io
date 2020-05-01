@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="异步编程,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="协程 协程，又称作Coroutine。字面上理解，即协同运行的例程，它是比线程更细量级的用户态线程，特点是允许用户的主动调用和主动退出，挂起当前例程然后返回值获去执行其他任务，接者返回原理停下的点继续执行。 等下，有点意思了。我们都知道一般函数都是线性执行的，不可能说执行到一半返回，等会儿又跑回原来的地方接着执行。不过熟悉python的都知道python中有个关键字yield，yield能够把一个">
+<meta name="keywords" content="异步编程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python 协程">
+<meta property="og:url" content="http://yoursite.com/2019/10/11/python-协程/index.html">
+<meta property="og:site_name" content="小严随笔">
+<meta property="og:description" content="协程 协程，又称作Coroutine。字面上理解，即协同运行的例程，它是比线程更细量级的用户态线程，特点是允许用户的主动调用和主动退出，挂起当前例程然后返回值获去执行其他任务，接者返回原理停下的点继续执行。 等下，有点意思了。我们都知道一般函数都是线性执行的，不可能说执行到一半返回，等会儿又跑回原来的地方接着执行。不过熟悉python的都知道python中有个关键字yield，yield能够把一个">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://orcs.xyz:5000/uploads/big/f74e38cb9c5aea387d76f49af3b0d51f.png">
+<meta property="og:updated_time" content="2019-10-17T01:56:31.532Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="python 协程">
+<meta name="twitter:description" content="协程 协程，又称作Coroutine。字面上理解，即协同运行的例程，它是比线程更细量级的用户态线程，特点是允许用户的主动调用和主动退出，挂起当前例程然后返回值获去执行其他任务，接者返回原理停下的点继续执行。 等下，有点意思了。我们都知道一般函数都是线性执行的，不可能说执行到一半返回，等会儿又跑回原来的地方接着执行。不过熟悉python的都知道python中有个关键字yield，yield能够把一个">
+<meta name="twitter:image" content="http://orcs.xyz:5000/uploads/big/f74e38cb9c5aea387d76f49af3b0d51f.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/10/11/python-协程/">
+
+
+
+
+
+  <title>python 协程 | 小严随笔</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">小严随笔</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/11/python-协程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="orcs bin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小严随笔">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">python 协程</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-11T14:45:28+08:00">
+                2019-10-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="协程"><a href="#协程" class="headerlink" title="协程"></a>协程</h1><blockquote>
+<p>协程，又称作Coroutine。字面上理解，即协同运行的例程，它是比线程更细量级的用户态线程，特点是允许用户的主动调用和主动退出，挂起当前例程然后返回值获去执行其他任务，接者返回原理停下的点继续执行。<br> 等下，有点意思了。我们都知道一般函数都是线性执行的，不可能说执行到一半返回，等会儿又跑回原来的地方接着执行。不过熟悉python的都知道python中有个关键字yield，yield能够把一个函数变成一个生成器（generator），与return不同，yield在函数中返回值的时候会保存函数的状态，使得下次调用函数时会从上一次的状态继续执行，即从yield的下一条语句开始执行，这样做有许多好处，比如我们想要生成一个数列，若数列的存储空间太大，而我们仅仅需要访问前面几个元素，那么yield就排上用场了，它实现了这种一边循环一边计算的机制，节省了存储空间，提高了运行效率。</p>
+</blockquote>
+<h2 id="生产者-消费者的协程"><a href="#生产者-消费者的协程" class="headerlink" title="生产者-消费者的协程"></a>生产者-消费者的协程</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">consumer</span><span class="params">()</span>:</span></span><br><span class="line">    status = <span class="literal">True</span></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        n = <span class="keyword">yield</span> status</span><br><span class="line">        print(<span class="string">"我拿到了&#123;&#125;！"</span>.format(n))</span><br><span class="line">        <span class="keyword">if</span> n == <span class="number">3</span>:</span><br><span class="line">            status = <span class="literal">False</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">producer</span><span class="params">(consumer)</span>:</span></span><br><span class="line">    n = <span class="number">5</span></span><br><span class="line">    <span class="keyword">while</span> n &gt; <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">yield</span> consumer.send(n)</span><br><span class="line">        n -= <span class="number">1</span></span><br><span class="line">        </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    c = consumer() <span class="comment">#由于consumer()中存在yield关键字，consumer已变为生成器，此处不是函数调用！！！相当于一个赋值语句返回一个生成器对象。</span></span><br><span class="line">    c.send(<span class="literal">None</span>) <span class="comment">#.send()用于将生成器执行到yield语句之前，注意yield并未执行。</span></span><br><span class="line">    p = producer(c) <span class="comment">#此处同理producer也是一个生成器。</span></span><br><span class="line">    <span class="keyword">for</span> status <span class="keyword">in</span> p:</span><br><span class="line">        <span class="keyword">if</span> status == <span class="literal">False</span>:</span><br><span class="line">            print(<span class="string">"我只要3，4，5就行了！"</span>)</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">    print(<span class="string">"程序结束！"</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment">#我拿到了5!</span></span><br><span class="line">    <span class="comment">#我拿到了4!</span></span><br><span class="line">    <span class="comment">#我拿到了3!</span></span><br><span class="line">    <span class="comment">#我只要3,4,5就行啦</span></span><br><span class="line">    <span class="comment">#程序结束</span></span><br></pre></td></tr></table></figure>
+
+<p>这个例子是典型的生产者-消费者问题，这里用协程的方式来实现他。首先从主程序中开始看，第一句 c = consumer()，因为consumer函数中存在yield语句，python会把它当成一个generator，因此在执行这条语句后，python并不会像执行函数一样，而是返回一个generator object。</p>
+<p>再看第二条语句c.send(None)，这条语句的作用是将consumer(即变量c，他是一个generator)中的语句推进到第一个yield语句出现的位置，那么在例子中，consumer中的status = True 和 while True: 都已经执行了，程序停留在n = yield status的位置（注意此时这条语句没有被执行），上面说的send(None)语句十分重要，如果漏写这一句，那么程序直接报错，这个send方法看上去挺神奇。</p>
+<p>下面第三句p = producer(c)，这里则像上面一样定义了producer的生成器，注意的是这里传入了消费者的生成器，来让producer跟consumer通信。</p>
+<p>第四句for status in p: 这条语句会循环地运行producer，获取它yield回来的状态。</p>
+<p>OK，进入正题** 现在我们要让生产者发送1，2，3，4，5给消费者，消费者接受数字，返回状态给生产者，而我们的消费者只需要3，4，5就行了，当数字等于3时，会返回一个错误的状态。最终我们需要由主程序来监控生产者-消费者的过程状态，调度结束程序。**</p>
+<p>现在程序流进入了producer里面，我们直接看yield consumer.send(n)，生产者调用了消费者的send()方法，把n发送给consumer(即c)，在consumer中的n = yield status，n拿到的时消费者发送的数字，同时，consumer用yield的方式把状态（status）返回给消费者，注意：这时producer（即消费者）的consumer.send()调用返回的就是consumer中的yield的status状态。消费者立即将status返回给调度它的主程序，主程序获取状态，判断是否错误，若错误则终止循环，结束程序。上面看起来有点绕，其实这里面generator.send(n)的作用是：把n发送给generator（生成器）中的yield的赋值语句中，同时返回generator中的yield的变量（结果）。</p>
+<p>于是程序便一直运作，直至consumer中获取的n的值变为3！此时consumer把status变为False，最后返回到主程序，主程序终端循环，程序结束。</p>
+<h2 id="conroutine与generator"><a href="#conroutine与generator" class="headerlink" title="conroutine与generator"></a>conroutine与generator</h2><p>有些人会把生成器（generator）和协程（coroutine）的概念混淆，实际上两者的区别还是很大的。  </p>
+<p>直接上最主要的区别：  </p>
+<ul>
+<li>generator总是生成值，一般是迭代的序列</li>
+<li>coroutine关注的是消耗值，是数据（data）的消费者</li>
+<li>coroutine不会与迭代操作关联，而generator会</li>
+<li>conroutine强调协同控制程序流，generator强调保存状态和产生数据  </li>
+</ul>
+<p>相似的是，他们都是不用return来实现重复调用的函数/对象，都用到了yield（中断/恢复）的方式来实现。</p>
+<h2 id="asyncio"><a href="#asyncio" class="headerlink" title="asyncio"></a>asyncio</h2><p>asyncio是python3.4中新增的模块，它提供了一种机制，使得你可以用协程（coroutines）、IO复用（multiplexing I/O）在单线程环境中编写编写并发模型。</p>
+<p>根据官方的说明，asyncio模块主要包括了：  </p>
+<ul>
+<li>具有特定系统实现事件循环（event loop）；</li>
+<li>数据通讯和协议抽象（类似Twisted中的部分）；</li>
+<li>TCP、UDP、SSL，子进程管道，延迟调用和其他；</li>
+<li>Future类；</li>
+<li>yield from 的支持；</li>
+<li>同步的支持；</li>
+<li>提供向线程池转移作业的接口；  </li>
+</ul>
+<p>下面来看一下asyncio的一个例子：  </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> asyncio</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">compute</span><span class="params">(x,y)</span>:</span></span><br><span class="line">    print(<span class="string">"Compute %s+%s..."</span>%(x,y))</span><br><span class="line">    <span class="keyword">await</span> asyncio.sleep(<span class="number">1.0</span>)</span><br><span class="line">    <span class="keyword">return</span> x+y</span><br><span class="line">    </span><br><span class="line"><span class="keyword">async</span> <span class="function"><span class="keyword">def</span> <span class="title">print_sum</span><span class="params">(x,y)</span>:</span></span><br><span class="line">    result = <span class="keyword">await</span> compute(x,y)</span><br><span class="line">    print(<span class="string">"&#123;&#125;+&#123;&#125;=&#123;&#125;"</span>.format(x,y,result))</span><br><span class="line">    </span><br><span class="line">loop = asyncio.get_event_loop()</span><br><span class="line">loop.run_until_complete(print_sum(<span class="number">1</span>,<span class="number">2</span>))</span><br><span class="line">loop.close()</span><br></pre></td></tr></table></figure>
+
+<p>程序流程图：<br><img src="http://orcs.xyz:5000/uploads/big/f74e38cb9c5aea387d76f49af3b0d51f.png">  </p>
+<p>当事件循环开始时，他会在Task中寻找coroutine来执行调度，因为事件循环注册了print_sum()，因此print_sum()被调用，执行result = await compute(x,y)这条语句(等同于result = yield from compute(x,y))，因为compute()自身就是一个coroutine，因此print_sum()这个协程就会暂时被挂起，compute()被加入到事件循环中，程序流执行compute()中的print语句。打印输出，然后执行了await asyncio.sleep(1.0),因为asyncio.sleep()也是一个协程，接着compute()就会被挂起，等待计时器读秒，在这1秒的过程中，事件循环回在队列中查找可以被调度的协程，而因为此前print_sum()与compute()被已经被挂起了，因此事件循环会停下来等待协程的调度，当计时器读秒结束后，程序流便会返回到compute()中执行return语句，结果会返回到print_sum()中的result中，最后打印result，事件队列中没有可调度的任务了，此时loop.close()把事件队列关闭，程序结束。  </p>
+<p>最后在测试一个例子，演示<strong><em>事件驱动</em></strong>模型的运作原理。  </p>
+<p>首先用同步的方式抓取百度的100个页面。  </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sync_way</span><span class="params">()</span>:</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">100</span>):</span><br><span class="line">        sock = socket.socket()</span><br><span class="line">        sock.connect((<span class="string">'www.baidu.com'</span>,<span class="number">80</span>))</span><br><span class="line">        print(<span class="string">'connected'</span>)</span><br><span class="line">        request = <span class="string">'GET &#123;&#125; HTTP/1.0\r\nHost: www.baidu.com\r\n\r\n'</span>.format(<span class="string">'/s?wd=&#123;&#125;'</span>.format(i))</span><br><span class="line">        sock.send(request.encode(<span class="string">'ascii'</span>))</span><br><span class="line">        respense = <span class="string">b''</span></span><br><span class="line">        chunk = sock.recv(<span class="number">4096</span>)</span><br><span class="line">        <span class="keyword">while</span> chunk:</span><br><span class="line">            respense += chunk</span><br><span class="line">            chunk = sock.recv(<span class="number">4096</span>)</span><br><span class="line">        </span><br><span class="line">        print(<span class="string">'Done!!'</span>)</span><br><span class="line">        </span><br><span class="line"><span class="keyword">from</span> time <span class="keyword">import</span> time</span><br><span class="line">start = time()</span><br><span class="line"></span><br><span class="line">sync_way()</span><br><span class="line"></span><br><span class="line">end = time()</span><br><span class="line"></span><br><span class="line">print(<span class="string">'Cost &#123;&#125;seconds'</span>.format(end - start))</span><br></pre></td></tr></table></figure>
+
+<p>总耗时47秒，这对于一个爬虫来说是不可接受的，看看如何将时间缩短到5秒以内。  </p>
+<p>首先考虑上面的瓶颈出在哪个地方：</p>
+<ol>
+<li>socket连接的建立需要等待，一旦握手建立的时间漫长，就会影响下面的流程正常运行。</li>
+<li>socket接收数据的过程是阻塞式的，等待buffer的过程也是需要一段时间的。</li>
+<li>socket的建立连接-接受过程都是一个一个来的，在没有完成一个连接时不能进行其他的连接处理。  </li>
+</ol>
+<p>好了，先解决第一个问题：socket的等待。痛点佷明显，我们不能一直等待socket的状态发生改变，而是当socket的状态发生改变时，让它告诉我们。要解决这个问题，可以利用io复用，先看看io复用的定义：  </p>
+<blockquote>
+<p>IO复用：预先告诉内核，使内核一旦发现进程指定的一个或多个IO条件就绪（输入准备被读取，或描述符能承接更多的输出），它就通知进程。  </p>
+</blockquote>
+<p>阻塞IO模型看起来是这样的：<br><strong><em>recvfrom-&gt;无数据报准备好-&gt;等待数据-&gt;数据报准备好-&gt;数据从内核复制到用户空间-&gt;复制完成-&gt;返回成功指示</em></strong></p>
+<p>而IO复用模型看起来是这样的：<br><strong><em>select-&gt;无数据报准备好-&gt;数据报准备好-&gt;返回可读条件-&gt;recvfrom-&gt; 数据丛内核空间复制到用户空间-&gt;复制完成-&gt;返回成功指示</em></strong></p>
+<p>于是我们修改代码:  </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> selectors <span class="keyword">import</span> DefaultSelector,EVENT_WRITE</span><br><span class="line">selector = DefaultSelector()</span><br><span class="line"></span><br><span class="line">sock = socket.socket()</span><br><span class="line">sock.setblocking(<span class="literal">False</span>)</span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    sock.connect((<span class="string">'www.baidu.com'</span>,<span class="number">80</span>))</span><br><span class="line"><span class="keyword">except</span> BlockingIOError:</span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line">    </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">connected</span><span class="params">()</span>:</span></span><br><span class="line">    selector.unregister(sock.fileno())</span><br><span class="line">    print(<span class="string">'connected!'</span>)</span><br><span class="line"></span><br><span class="line">selector.register(sock.fileno(),EVENT_WRITE,connected)</span><br></pre></td></tr></table></figure>
+
+<p>把socket设置为非阻塞,把socket的句柄注册到事件轮询中,当socket发生可写事件时,表示socket连接就绪了,这时候再把socket从事件轮询中删除,在socket返回可写事件之前,系统都不是阻塞状态的.同理,对于socket从网络中接受数据,也可以使用同样的方法,只需要把要监听的事件改为可读事件就行了.  </p>
+<p>当然这还不够,试想,如果有多个socket进行连接,采用上面的非阻塞方式,当一个socket开始等待事件返回时,理论上系统此时因该做的是处理另一个socket的流程,但是这里还缺乏了一个必要的机制,当从一个处理socket流程切换到另一个socket的流程时,原来的流程上下文状态该怎么保存下来一边恢复呢,显然这里需要来到上面说到的协程机制,在python中通过yield语法可以把一个函数或方法包装成一个生成器,当生成器执行yield语句时,生成器内部的上下文状态就会被保存,如果想要在未来的操作中把这个生成器恢复,只需要调用生成器的send方法即可从原流程中继续往下走.  </p>
+<p>有了上面的概念,我们可以创建一个Future类,它代表了协程中等待的”未来发生的结果”,举例来说,在发起网络请求时,socket会在buffer中返回一些数据,这个获取的动作在异步流程中的时间是不确定的,Future就是用来封装这个未来结果的类,但当socket在某个时间段检测到可读事件,读取到数据了,那么他就会把数据写入Future里,并告知Future要执行的某些回调动作.  </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">future</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.result = <span class="literal">None</span></span><br><span class="line">        self._callbacks = []</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">add_done_callback</span><span class="params">(self,fn)</span>:</span></span><br><span class="line">        self._callbacks.append(fn)</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">set_result</span><span class="params">(self,result)</span>:</span></span><br><span class="line">        self.result = result</span><br><span class="line">        <span class="keyword">for</span> callback <span class="keyword">in</span> self._callbacks:</span><br><span class="line">            callback(self)</span><br><span class="line"></span><br><span class="line">```   </span><br><span class="line"></span><br><span class="line">有了Future,我们可以包装一个AsyncRequset类,用以发起异步请求的操作.  </span><br><span class="line"></span><br><span class="line">```python</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AsyncRequset</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self,host,url,port,timeout=<span class="number">5</span>)</span>:</span></span><br><span class="line">        self.sock = socket.socket()</span><br><span class="line">        self.sock.settimeout(timeout)</span><br><span class="line">        self.sock.setblocking(false)</span><br><span class="line">        self.host = host</span><br><span class="line">        self.url = url</span><br><span class="line">        self.port = port </span><br><span class="line">        self.method = <span class="literal">None</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.method = <span class="string">'GET'</span></span><br><span class="line">        self.request = <span class="string">'&#123;&#125; &#123;&#125; HTTP/1.0\r\nHost: &#123;&#125;\r\n\r\n'</span>.format(self.method, self.url, self.host)</span><br><span class="line">        <span class="keyword">return</span> self</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">process</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> self.method <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">            self.get()</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            self.sock.connect((self.host,self.port))</span><br><span class="line">        <span class="keyword">except</span> BlockingIOError:</span><br><span class="line">            <span class="keyword">pass</span></span><br><span class="line">        self.f = Future()</span><br><span class="line">        selector.register(self.sock.fileno(),EVENT_WRITE,self.on_connected)</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">yield</span> self.f</span><br><span class="line">        selector.unregister(self.sock.fileno())</span><br><span class="line">        </span><br><span class="line">        self.sock.send(self.request.encode(<span class="string">'ascii'</span>))</span><br><span class="line">        </span><br><span class="line">        chunk = <span class="keyword">yield</span> <span class="keyword">from</span> read_all(self.sock)</span><br><span class="line">        <span class="keyword">return</span> chunk</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">on_connected</span><span class="params">(self,key,mask)</span>:</span></span><br><span class="line">        self.f.set_result(<span class="literal">None</span>)</span><br></pre></td></tr></table></figure>
+
+<p>在AsyncRequest的poress方法里,实例在发起异步请求后通过yield一个future阻断了程序流,表示它需要等待未来发生的动作发生(在这里是等待socket可写),这时候系统会去执行其他事件,当未来socket变成可写时,future被写入数据,同时执行回调,从原来停下来的地方开始执行,执行读取socket数据的处理.  </p>
+<p>这里关键的地方就是future在yield之后会在未来某个时候再次被send然后继续往下走,这时候就需要一个用来驱动Future的类.这里称之为Task,它需要接受一个协程作为参数,并驱动协程的程序流执行.  </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Task</span><span class="params">(Future)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self,corc)</span>:</span><span class="comment">#传入一个协程对象</span></span><br><span class="line">        super().__init__()</span><br><span class="line">        self.corc = coro</span><br><span class="line">        f = Future()</span><br><span class="line">        f.set_result(<span class="literal">None</span>)</span><br><span class="line">        self.step(f)</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">step</span><span class="params">()</span>:</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            next_future = self.coro.send(future.result)</span><br><span class="line">            <span class="keyword">if</span> next_future <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">                <span class="keyword">return</span></span><br><span class="line">              </span><br><span class="line">        <span class="keyword">except</span> StopIteration <span class="keyword">as</span> exc:</span><br><span class="line">            self.set_result(exc.Value)</span><br><span class="line">            <span class="keyword">return</span> </span><br><span class="line">        next_future.add_done_callback(self.step)</span><br></pre></td></tr></table></figure>
+
+<p>最终,整个程序还需要一个EventLoop类,用来监听到来的事件为socket执行回调以及把协程包装成Task来实现异步驱动.  </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">EventLoop</span>:</span></span><br><span class="line">    stopped = <span class="literal">False</span></span><br><span class="line">    select_timeout = <span class="number">5</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run_until_complete</span><span class="params">(self,coros)</span>:</span></span><br><span class="line">        tasks = [Tasd(coro) <span class="keyword">for</span> coro <span class="keyword">in</span> coros]</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            self.run_forever()</span><br><span class="line">        <span class="keyword">except</span> StopError:</span><br><span class="line">            <span class="keyword">pass</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run_forever</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">not</span> self.stopped:</span><br><span class="line">            events = selector.select(self.select_timeout)</span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> events:</span><br><span class="line">                <span class="keyword">raise</span> SelectTimeout(<span class="string">'轮询超时'</span>)</span><br><span class="line">                        </span><br><span class="line">            <span class="keyword">for</span> event_key,event_mask <span class="keyword">in</span> events:</span><br><span class="line">                callback = event_key.data</span><br><span class="line">                callback(event_key,event_mask)</span><br><span class="line">            </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">close</span><span class="params">(self)</span>:</span></span><br><span class="line">    self.stopped = <span class="literal">True</span></span><br></pre></td></tr></table></figure>
+
+<p>OK,那么现在用新的方法在测试一遍,通过python3的yield from语法我们把协程操作代理到AsyncRequset类的process方法中,最终把协程放到EventLoop中执行.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">fetch</span><span class="params">(url)</span>:</span></span><br><span class="line">    request = AsyncRequset(<span class="string">'www.baidu.com'</span>,url,<span class="number">80</span>)</span><br><span class="line">    data = <span class="keyword">yield</span> <span class="keyword">from</span> request.process()</span><br><span class="line">    <span class="keyword">return</span> data</span><br><span class="line">   </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_page</span><span class="params">(url)</span>:</span></span><br><span class="line">    page = <span class="keyword">yield</span> <span class="keyword">from</span> fetch(url)</span><br><span class="line">    <span class="keyword">return</span> page</span><br><span class="line">    </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">async_way</span><span class="params">()</span>:</span></span><br><span class="line">    ev_loop = get_event_loop()</span><br><span class="line">    ev_loop.run_until_complete([get_page(<span class="string">'/s?wd=&#123;&#125;'</span>.format(i))  <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">100</span>)])</span><br><span class="line">    </span><br><span class="line"><span class="keyword">from</span> time <span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">start = time()</span><br><span class="line"></span><br><span class="line">async_way() <span class="comment">#Cost 3.5S</span></span><br><span class="line"></span><br><span class="line">end = time()</span><br><span class="line"></span><br><span class="line">print(<span class="string">'Cost &#123;&#125; seconds'</span>.format(end-start))</span><br></pre></td></tr></table></figure>
+
+<p>最终结果为3.5秒,通过把同步改写为基于事件驱动的异步,整个程序的效率提高了十倍以上.   </p>
+<p>有了上面的基础,可以更进一步的写出一个任务队列的异步处理形式,把EventLoop的实现隐藏,提供更简单的接口.  </p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> deque</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Queue</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self._q = deque()</span><br><span class="line">        self.size = <span class="number">0</span></span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">put</span><span class="params">(self,item)</span>:</span></span><br><span class="line">        self.size += <span class="number">1</span></span><br><span class="line">        self._q.append(item)</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.size -= <span class="number">1</span></span><br><span class="line">        <span class="keyword">if</span> self.size == <span class="number">0</span>:</span><br><span class="line">            self.empty_callback()</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AsyncWorker</span><span class="params">(Queue)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self,coroutine,workers = <span class="number">10</span>,loop_timeout=<span class="number">5</span>)</span>:</span></span><br><span class="line">        super().__init__()</span><br><span class="line">        self.func = coroutine</span><br><span class="line">        self.stopped = <span class="literal">False</span></span><br><span class="line">        self.ev_loop = get_event_loop()</span><br><span class="line">        self.ev_loop.select_timeout = loop_timeout</span><br><span class="line">        self.workers = workers</span><br><span class="line">        self.result_callbacks = []</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">work</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">_work</span><span class="params">()</span>:</span></span><br><span class="line">            <span class="keyword">while</span> <span class="keyword">not</span> self.stopped:</span><br><span class="line">                item = <span class="literal">None</span></span><br><span class="line">                <span class="keyword">try</span>:</span><br><span class="line">                    item = self.get()</span><br><span class="line">                <span class="keyword">except</span> IndexError:</span><br><span class="line">                    <span class="keyword">yield</span> <span class="literal">None</span></span><br><span class="line">                result = <span class="keyword">yield</span> <span class="keyword">from</span> self.func(item)</span><br><span class="line">                self.task_done()</span><br><span class="line">                <span class="keyword">for</span> callback <span class="keyword">in</span> self.result_callbacks:</span><br><span class="line">                    callback(result)</span><br><span class="line">            </span><br><span class="line">        self.tasks = []</span><br><span class="line">        <span class="keyword">for</span> _ <span class="keyword">in</span> range(self.workers):</span><br><span class="line">            self.tasks.append(_work())</span><br><span class="line">        </span><br><span class="line">        self.ev_loop.run_until_complete(self.tasks)</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">add_result_callbacks</span><span class="params">(self,func)</span>:</span></span><br><span class="line">        self.result_callbacks.append(func)</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">empty_callback</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.ev_loop.close()</span><br><span class="line">    </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">print_content_length</span><span class="params">(data)</span>:</span></span><br><span class="line">    print(len(data))</span><br><span class="line">    </span><br><span class="line">async_worker = AsyncWorker(get_page,workers =<span class="number">20</span>)</span><br><span class="line">async_worker.add_done_callback(print_content_length)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">15</span>):</span><br><span class="line">    async_worker.put(<span class="string">'/s?wd=&#123;&#125;'</span>.format(i))</span><br><span class="line"></span><br><span class="line">async_worker.work()</span><br></pre></td></tr></table></figure>
+
+<p>参考文献:<br><a href="http://aosabook.org/en/500L/a-web-crawler-with-asyncio-coroutines.html" target="_blank" rel="noopener">A Web Crawler With AsyncRequsetsyncio Coroutines</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/异步编程/" rel="tag"># 异步编程</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/10/06/开源面部识别库/" rel="next" title="开源面部识别库">
+                <i class="fa fa-chevron-left"></i> 开源面部识别库
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">orcs bin</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#协程"><span class="nav-number">1.</span> <span class="nav-text">协程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#生产者-消费者的协程"><span class="nav-number">1.1.</span> <span class="nav-text">生产者-消费者的协程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#conroutine与generator"><span class="nav-number">1.2.</span> <span class="nav-text">conroutine与generator</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#asyncio"><span class="nav-number">1.3.</span> <span class="nav-text">asyncio</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">orcs bin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

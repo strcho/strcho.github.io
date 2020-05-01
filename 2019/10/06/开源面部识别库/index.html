@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="study,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="昨天刚从老家回到学校导致更新丢了两天，今天补更新一篇关于开源面部识别库的函数接口。模块名称：face_recognition这是一个封装好的面部识别python第三方库，开源地址。项目的基本功能在其主页的readme文件中已有详细介绍。下面仅记录在过去的项目中所使用到的函数接口。 load_image_file() 参数：一张图片文件，图片的色彩空间模式（默认色彩空间为RGB）功能：读取一张图片文">
+<meta name="keywords" content="study">
+<meta property="og:type" content="article">
+<meta property="og:title" content="开源面部识别库">
+<meta property="og:url" content="http://yoursite.com/2019/10/06/开源面部识别库/index.html">
+<meta property="og:site_name" content="小严随笔">
+<meta property="og:description" content="昨天刚从老家回到学校导致更新丢了两天，今天补更新一篇关于开源面部识别库的函数接口。模块名称：face_recognition这是一个封装好的面部识别python第三方库，开源地址。项目的基本功能在其主页的readme文件中已有详细介绍。下面仅记录在过去的项目中所使用到的函数接口。 load_image_file() 参数：一张图片文件，图片的色彩空间模式（默认色彩空间为RGB）功能：读取一张图片文">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-10-06T14:12:29.328Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="开源面部识别库">
+<meta name="twitter:description" content="昨天刚从老家回到学校导致更新丢了两天，今天补更新一篇关于开源面部识别库的函数接口。模块名称：face_recognition这是一个封装好的面部识别python第三方库，开源地址。项目的基本功能在其主页的readme文件中已有详细介绍。下面仅记录在过去的项目中所使用到的函数接口。 load_image_file() 参数：一张图片文件，图片的色彩空间模式（默认色彩空间为RGB）功能：读取一张图片文">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/10/06/开源面部识别库/">
+
+
+
+
+
+  <title>开源面部识别库 | 小严随笔</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">小严随笔</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/06/开源面部识别库/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="orcs bin">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小严随笔">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">开源面部识别库</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-06T14:36:40+08:00">
+                2019-10-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>昨天刚从老家回到学校导致更新丢了两天，今天补更新一篇关于开源面部识别库的函数接口。模块名称：face_recognition<br>这是一个封装好的面部识别python第三方库，<a href="'https://github.com/ageitgey/face_recognition'">开源地址</a>。项目的基本功能在其主页的readme文件中已有详细介绍。下面仅记录在过去的项目中所使用到的函数接口。</p>
+<h1 id="load-image-file"><a href="#load-image-file" class="headerlink" title="load_image_file()"></a>load_image_file()</h1><blockquote>
+<p>参数：一张图片文件，图片的色彩空间模式（默认色彩空间为RGB）<br>功能：读取一张图片文件<br>返回值：包含图像信息的numpy数组对象  </p>
+</blockquote>
+<h2 id="源码："><a href="#源码：" class="headerlink" title="源码："></a>源码：</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">load_image_file</span><span class="params">(file, mode=<span class="string">'RGB'</span>)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    Loads an image file (.jpg, .png, etc) into a numpy array</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    :param file: image file name or file object to load</span></span><br><span class="line"><span class="string">    :param mode: format to convert the image to. Only 'RGB' (8-bit RGB, 3 channels) and 'L' (black and white) are supported.</span></span><br><span class="line"><span class="string">    :return: image contents as numpy array</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    im = PIL.Image.open(file) <span class="comment"># 使用PIL打开文件</span></span><br><span class="line">    <span class="keyword">if</span> mode:</span><br><span class="line">        im = im.convert(mode) <span class="comment"># 设置图片的颜色空间</span></span><br><span class="line">    <span class="keyword">return</span> np.array(im)       <span class="comment"># 返回numpy数组</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="face-location"><a href="#face-location" class="headerlink" title="face_location()"></a>face_location()</h1><blockquote>
+<p> 参数：numpy数组（load_face_file的返回值），查找面部的次数，次数越大越容易找到难以发现的面部（默认值为1），选择使用哪种人脸检测模型。 “hog”不太准确，但在CPU上更快。 “cnn”更准确 ，深度学习模型，GPU / CUDA加速（如果可用）。 默认为“hog”。<br>功能：找出图片中人脸的位置<br>返回值：list列表  </p>
+</blockquote>
+<h3 id="源码：-1"><a href="#源码：-1" class="headerlink" title="源码："></a>源码：</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">face_locations</span><span class="params">(img, number_of_times_to_upsample=<span class="number">1</span>, model=<span class="string">"hog"</span>)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    Returns an array of bounding boxes of human faces in a image</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    :param img: An image (as a numpy array)</span></span><br><span class="line"><span class="string">    :param number_of_times_to_upsample: How many times to upsample the image looking for faces. Higher numbers find smaller faces.</span></span><br><span class="line"><span class="string">    :param model: Which face detection model to use. "hog" is less accurate but faster on CPUs. "cnn" is a more accurate</span></span><br><span class="line"><span class="string">                  deep-learning model which is GPU/CUDA accelerated (if available). The default is "hog".</span></span><br><span class="line"><span class="string">    :return: A list of tuples of found face locations in css (top, right, bottom, left) order</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">if</span> model == <span class="string">"cnn"</span>:</span><br><span class="line">        <span class="keyword">return</span> [_trim_css_to_bounds(_rect_to_css(face.rect), img.shape) <span class="keyword">for</span> face <span class="keyword">in</span> _raw_face_locations(img, number_of_times_to_upsample, <span class="string">"cnn"</span>)]</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">return</span> [_trim_css_to_bounds(_rect_to_css(face), img.shape) <span class="keyword">for</span> face <span class="keyword">in</span> _raw_face_locations(img, number_of_times_to_upsample, model)]</span><br></pre></td></tr></table></figure>
+
+<h1 id="batch-face-locations"><a href="#batch-face-locations" class="headerlink" title="batch_face_locations()"></a>batch_face_locations()</h1><blockquote>
+<p>参数：一个内部元素为numpy数组的list，每张图的查找次数，每个GPU一次处理的图像数默认为128<br>功能：使用cnn面检测器返回图像中人脸边界框的二维数组，如果使用的是GPU，这可以为您提供更快的结果<br> 可以一次处理批量图像。 如果不使用GPU，则不需要此功能。<br>返回值: 包含图像中人脸边界框元组的list   </p>
+</blockquote>
+<h3 id="源码：-2"><a href="#源码：-2" class="headerlink" title="源码："></a>源码：</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">batch_face_locations</span><span class="params">(images, number_of_times_to_upsample=<span class="number">1</span>, batch_size=<span class="number">128</span>)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    Returns an 2d array of bounding boxes of human faces in a image using the cnn face detector</span></span><br><span class="line"><span class="string">    If you are using a GPU, this can give you much faster results since the GPU</span></span><br><span class="line"><span class="string">    can process batches of images at once. If you aren't using a GPU, you don't need this function.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    :param img: A list of images (each as a numpy array)</span></span><br><span class="line"><span class="string">    :param number_of_times_to_upsample: How many times to upsample the image looking for faces. Higher numbers find smaller faces.</span></span><br><span class="line"><span class="string">    :param batch_size: How many images to include in each GPU processing batch.</span></span><br><span class="line"><span class="string">    :return: A list of tuples of found face locations in css (top, right, bottom, left) order</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">convert_cnn_detections_to_css</span><span class="params">(detections)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> [_trim_css_to_bounds(_rect_to_css(face.rect), images[<span class="number">0</span>].shape) <span class="keyword">for</span> face <span class="keyword">in</span> detections]</span><br><span class="line"></span><br><span class="line">    raw_detections_batched = _raw_face_locations_batched(images, number_of_times_to_upsample, batch_size)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> list(map(convert_cnn_detections_to_css, raw_detections_batched))</span><br></pre></td></tr></table></figure>
+
+<h1 id="face-landmarks"><a href="#face-landmarks" class="headerlink" title="face_landmarks()"></a>face_landmarks()</h1><blockquote>
+<p>功能：给定图像，返回图像中每个面部的面部特征位置（眼睛，鼻子等）的字典<br>参数：要搜索的图像，选择要检查的面部位置列表，选择要使用的模型的大小<br>返回值：面部特征的位置（眼睛，鼻子…）的列表  </p>
+</blockquote>
+<h3 id="源码：-3"><a href="#源码：-3" class="headerlink" title="源码："></a>源码：</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">face_landmarks</span><span class="params">(face_image, face_locations=None, model=<span class="string">"large"</span>)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    Given an image, returns a dict of face feature locations (eyes, nose, etc) for each face in the image</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    :param face_image: image to search</span></span><br><span class="line"><span class="string">    :param face_locations: Optionally provide a list of face locations to check.</span></span><br><span class="line"><span class="string">    :param model: Optional - which model to use. "large" (default) or "small" which only returns 5 points but is faster.</span></span><br><span class="line"><span class="string">    :return: A list of dicts of face feature locations (eyes, nose, etc)</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    landmarks = _raw_face_landmarks(face_image, face_locations, model)</span><br><span class="line">    landmarks_as_tuples = [[(p.x, p.y) <span class="keyword">for</span> p <span class="keyword">in</span> landmark.parts()] <span class="keyword">for</span> landmark <span class="keyword">in</span> landmarks]</span><br><span class="line"></span><br><span class="line">    <span class="comment"># For a definition of each point index, see https://cdn-images-1.medium.com/max/1600/1*AbEg31EgkbXSQehuNJBlWg.png</span></span><br><span class="line">    <span class="keyword">if</span> model == <span class="string">'large'</span>:</span><br><span class="line">        <span class="keyword">return</span> [&#123;</span><br><span class="line">            <span class="string">"chin"</span>: points[<span class="number">0</span>:<span class="number">17</span>],</span><br><span class="line">            <span class="string">"left_eyebrow"</span>: points[<span class="number">17</span>:<span class="number">22</span>],</span><br><span class="line">            <span class="string">"right_eyebrow"</span>: points[<span class="number">22</span>:<span class="number">27</span>],</span><br><span class="line">            <span class="string">"nose_bridge"</span>: points[<span class="number">27</span>:<span class="number">31</span>],</span><br><span class="line">            <span class="string">"nose_tip"</span>: points[<span class="number">31</span>:<span class="number">36</span>],</span><br><span class="line">            <span class="string">"left_eye"</span>: points[<span class="number">36</span>:<span class="number">42</span>],</span><br><span class="line">            <span class="string">"right_eye"</span>: points[<span class="number">42</span>:<span class="number">48</span>],</span><br><span class="line">            <span class="string">"top_lip"</span>: points[<span class="number">48</span>:<span class="number">55</span>] + [points[<span class="number">64</span>]] + [points[<span class="number">63</span>]] + [points[<span class="number">62</span>]] + [points[<span class="number">61</span>]] + [points[<span class="number">60</span>]],</span><br><span class="line">            <span class="string">"bottom_lip"</span>: points[<span class="number">54</span>:<span class="number">60</span>] + [points[<span class="number">48</span>]] + [points[<span class="number">60</span>]] + [points[<span class="number">67</span>]] + [points[<span class="number">66</span>]] + [points[<span class="number">65</span>]] + [points[<span class="number">64</span>]]</span><br><span class="line">        &#125; <span class="keyword">for</span> points <span class="keyword">in</span> landmarks_as_tuples]</span><br><span class="line">    <span class="keyword">elif</span> model == <span class="string">'small'</span>:</span><br><span class="line">        <span class="keyword">return</span> [&#123;</span><br><span class="line">            <span class="string">"nose_tip"</span>: [points[<span class="number">4</span>]],</span><br><span class="line">            <span class="string">"left_eye"</span>: points[<span class="number">2</span>:<span class="number">4</span>],</span><br><span class="line">            <span class="string">"right_eye"</span>: points[<span class="number">0</span>:<span class="number">2</span>],</span><br><span class="line">        &#125; <span class="keyword">for</span> points <span class="keyword">in</span> landmarks_as_tuples]</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">raise</span> ValueError(<span class="string">"Invalid landmarks model type. Supported models are ['small', 'large']."</span>)</span><br></pre></td></tr></table></figure>
+
+<h1 id="face-encodings"><a href="#face-encodings" class="headerlink" title="face_encodings()"></a>face_encodings()</h1><blockquote>
+<p> 参数：包含一个或多个面部的图像，每个面部的边界框（可选项），计算编码时采集面部的次数越大越精确速度越慢（默认为1）。<br>功能：给定一张图像，返回图像中每个面部128维的面部编码<br>返回值：包含面部128维编码的字典  </p>
+</blockquote>
+<h3 id="源码：-4"><a href="#源码：-4" class="headerlink" title="源码："></a>源码：</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">face_encodings</span><span class="params">(face_image, known_face_locations=None, num_jitters=<span class="number">1</span>)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    Given an image, return the 128-dimension face encoding for each face in the image.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    :param face_image: The image that contains one or more faces</span></span><br><span class="line"><span class="string">    :param known_face_locations: Optional - the bounding boxes of each face if you already know them.</span></span><br><span class="line"><span class="string">    :param num_jitters: How many times to re-sample the face when calculating encoding. Higher is more accurate, but slower (i.e. 100 is 100x slower)</span></span><br><span class="line"><span class="string">    :return: A list of 128-dimensional face encodings (one for each face in the image)</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    raw_landmarks = _raw_face_landmarks(face_image, known_face_locations, model=<span class="string">"small"</span>)</span><br><span class="line">    <span class="keyword">return</span> [np.array(face_encoder.compute_face_descriptor(face_image, raw_landmark_set, num_jitters)) <span class="keyword">for</span> raw_landmark_set <span class="keyword">in</span> raw_landmarks]</span><br></pre></td></tr></table></figure>
+
+<h1 id="compare-faces"><a href="#compare-faces" class="headerlink" title="compare_faces()"></a>compare_faces()</h1><blockquote>
+<p>功能：将面部编码与候选编码进行比较，查看他们是否匹配。<br>参数：一个已知面部编码的列表，单个面部编码（用于与列表进行比较），匹配面部时的严格度默认最佳为0.6数值越小越严格<br>返回值：一个包含True和False的列表，表示哪个面部与其匹配  </p>
+</blockquote>
+<h3 id="源码：-5"><a href="#源码：-5" class="headerlink" title="源码："></a>源码：</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">compare_faces</span><span class="params">(known_face_encodings, face_encoding_to_check, tolerance=<span class="number">0.6</span>)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    Compare a list of face encodings against a candidate encoding to see if they match.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    :param known_face_encodings: A list of known face encodings</span></span><br><span class="line"><span class="string">    :param face_encoding_to_check: A single face encoding to compare against the list</span></span><br><span class="line"><span class="string">    :param tolerance: How much distance between faces to consider it a match. Lower is more strict. 0.6 is typical best performance.</span></span><br><span class="line"><span class="string">    :return: A list of True/False values indicating which known_face_encodings match the face encoding to check</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">return</span> list(face_distance(known_face_encodings, face_encoding_to_check) &lt;= tolerance)</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/study/" rel="tag"># study</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/10/03/opencv中的颜色空间/" rel="next" title="OpenCV中的颜色空间">
+                <i class="fa fa-chevron-left"></i> OpenCV中的颜色空间
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/10/11/python-协程/" rel="prev" title="python 协程">
+                python 协程 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">orcs bin</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">7</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#load-image-file"><span class="nav-number">1.</span> <span class="nav-text">load_image_file()</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#源码："><span class="nav-number">1.1.</span> <span class="nav-text">源码：</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#face-location"><span class="nav-number">2.</span> <span class="nav-text">face_location()</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#源码：-1"><span class="nav-number">2.0.1.</span> <span class="nav-text">源码：</span></a></li></ol></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#batch-face-locations"><span class="nav-number">3.</span> <span class="nav-text">batch_face_locations()</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#源码：-2"><span class="nav-number">3.0.1.</span> <span class="nav-text">源码：</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#face-landmarks"><span class="nav-number">4.</span> <span class="nav-text">face_landmarks()</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#源码：-3"><span class="nav-number">4.0.1.</span> <span class="nav-text">源码：</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#face-encodings"><span class="nav-number">5.</span> <span class="nav-text">face_encodings()</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#源码：-4"><span class="nav-number">5.0.1.</span> <span class="nav-text">源码：</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#compare-faces"><span class="nav-number">6.</span> <span class="nav-text">compare_faces()</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#源码：-5"><span class="nav-number">6.0.1.</span> <span class="nav-text">源码：</span></a></li></ol></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">orcs bin</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
